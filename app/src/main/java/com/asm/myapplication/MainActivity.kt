@@ -9,6 +9,10 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import java.util.concurrent.TimeUnit
 
 
@@ -29,8 +33,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-
-        scheduleJob()
+        val workRequest: WorkRequest =
+            OneTimeWorkRequestBuilder<MyWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .build()
+        WorkManager.getInstance(this).enqueue(workRequest)
     }
 
     private fun scheduleJob() {
